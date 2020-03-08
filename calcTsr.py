@@ -224,5 +224,26 @@ def test_02():
     assert round(float(str(resultList[2][2])), 4) ==  -01.4194
     assert round(float(str(resultList[2][3])), 4) ==  -01.1528
 
+def test_03():
+    # Test scenario: Compute the TSR for the closed PBL.AX position.
+    # This is an old, delisted security.
+
+    # Make the DB.
+    make_db("test_03_db.sql", "test_03.db")
+
+    subprocess.check_output("python calcTsr.py -f test_03.db -s test_03_db.sql -v --refresh-prices", shell=True, universal_newlines=True)
+
+    # Open the resulting DB. Check with respect to the worked example.
+    connection = sqlite3.connect("test_03.db")
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM Performance")
+    assert int(cursor.fetchall()[0][0]) == 1
+
+    cursor.execute("SELECT * FROM Performance ORDER BY PositionDateAcq")
+    resultList = cursor.fetchall()
+    assert round(float(str(resultList[0][2])), 4) ==   13.3538
+    assert round(float(str(resultList[0][3])), 4) ==   18.6035
+
 if __name__ == '__main__':
     main()
