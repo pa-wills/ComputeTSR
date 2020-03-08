@@ -98,7 +98,10 @@ def main():
             command += "AND DateOfClose <= \'" + str(todaysDate) + "\' "
         command += "ORDER BY DateOfClose DESC"
         cursor.execute(command)
-        closePrice = (cursor.fetchall())[0][0]
+        rows = cursor.fetchall()
+        closePrice = None
+        if rows != []:
+            closePrice = rows[0][0]
 
         if(opt_verbose == 1): print("And it closed most recently at: $" + str(closePrice))
 
@@ -242,8 +245,8 @@ def test_03():
 
     cursor.execute("SELECT * FROM Performance ORDER BY PositionDateAcq")
     resultList = cursor.fetchall()
-    assert round(float(str(resultList[0][2])), 4) ==   13.3538
-    assert round(float(str(resultList[0][3])), 4) ==   18.6035
+    assert round(float(str(resultList[0][2])), 4) ==   13.6090
+    assert round(float(str(resultList[0][3])), 4) ==   19.4530
 
 if __name__ == '__main__':
     main()
