@@ -107,6 +107,11 @@ def main():
         # Need the date in a sql-parseable format
         sqlDateBought = str(datetime.datetime.strftime(dateBought, '%Y-%m-%d'))
 
+        todaysDate = (re.match("\d{4}\-\d{2}\-\d{2}", today.isoformat())).group()
+        if (position[8] not in [None, '']):
+            todaysDate = datetime.datetime.strptime(position[8].strip(), "%Y-%m-%d")
+            print("Got to here")
+
         # Select all relevant distributions.
         sqlToFindDistributions = "SELECT * FROM Distributions WHERE Date_XD > \'"
         sqlToFindDistributions += sqlDateBought
