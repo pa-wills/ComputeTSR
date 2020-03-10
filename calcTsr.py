@@ -51,12 +51,6 @@ def main():
     cursor.execute(command)
     positions = cursor.fetchall()
 
-    # TODOs
-    # Proper logging.
-    # Securities prices should be refreshed from a unique select of securities in the positions table.
-    # The replace behaviour on the replace function isn't working properly.
-    # Handle the closed positions.
-
     # If flag --refresh-prices, then go grab them. Otherwise - use existing.
     if (opt_refresh_prices == 1):
 
@@ -64,19 +58,24 @@ def main():
 
         # Get the securities list.
         # TODO: the scope should be - the Ticker for any open position.
-        sqlToFindPrices = "SELECT DISTINCT SecurityName FROM ClosingPrices"
+        sqlToFindPrices = "SELECT DISTINCT Security FROM Positions ORDER BY Security"
         cursor.execute(sqlToFindPrices)
         securities = cursor.fetchall()
 
         # Get their closing prices, commit them.
         for security in securities:
             yfData = yf.Ticker(str(security[0]))
-            price_history = yfData.history(period = "max")
+            try:
+                price_history = yfData.history(period = "max")
+            except:
+                sqlUpdate = "REPLACE INTO ClosingPrices (\'DateOfClose\', \'SecurityName\', \'Price\') "
+                sqlUpdate += "VALUES (\'1970-01-01\', \'" + str(security[0]) + "\', \'0\')"
+                cursor.execute(sqlUpdate)
+                continue
             lineIterator = iter(str(price_history).splitlines())
             for line in lineIterator:
                 # Disregard the heading line
                 if (re.search("\d{4}\-\d{2}\-\d{2}", line) == None): continue
-
                 words = line.split()
                 sqlUpdate = ""
                 sqlUpdate += "REPLACE INTO ClosingPrices (\'DateOfClose\', \'SecurityName\', \'Price\') "
