@@ -20,7 +20,7 @@ def main():
         options, remainder = getopt.getopt(sys.argv[1:], 'vf:s:', ['refresh-prices', 'todays-date='])
         print(options)
     except getopt.GetoptError as err:
-        print str(err)
+        print(str(err))
         sys.exit(2)
     opt_verbose = 0
     opt_refresh_prices = 0
